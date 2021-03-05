@@ -97,6 +97,215 @@
 			"response": []
 		},
 		{
+			"name": "start process via process definition key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"var processInstanceId = jsonData.id;",
+							"console.log(processInstanceId);",
+							"pm.collectionVariables.set(\"processInstanceId\", processInstanceId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"variables\": {\r\n    \"aVariable\" : {\r\n        \"value\" : \"aStringValue\",\r\n        \"type\": \"String\"\r\n    },\r\n    \"anotherVariable\" : {\r\n      \"value\" : true,\r\n      \"type\": \"Boolean\"\r\n    }\r\n  },\r\n \"businessKey\" : \"myBusinessKey\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/engine-rest/process-definition/key/CamundorProcess/start",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"engine-rest",
+						"process-definition",
+						"key",
+						"CamundorProcess",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check for waiting external task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"assert external task credit deducting\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    console.log(jsonData);",
+							"    pm.expect(jsonData[0].topicName).to.eql(\"external-task-example\");",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"console.log(jsonData[0].id)",
+							"pm.collectionVariables.set(\"externalTaskId\", jsonData[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/engine-rest/external-task?processInstanceId={{processInstanceId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"engine-rest",
+						"external-task"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{processInstanceId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fetch and lock",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"external task id match\", function () {",
+							"    var externalTaskId = pm.collectionVariables.get(\"externalTaskId\");",
+							"    console.log(\"External task fetched: \" + externalTaskId);",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0].id).to.eql(externalTaskId);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"workerId\": \"postman test\",\n    \"maxTasks\": 1,\n    \"topics\": [\n        {\n            \"topicName\": \"external-task-example\",\n            \"lockDuration\": 10000\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/engine-rest/external-task/fetchAndLock",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"engine-rest",
+						"external-task",
+						"fetchAndLock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "complete the external task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"workerId\": \"postman test\",\n    \"variables\": {\n        \"allDone\": {\n            \"value\": false\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/engine-rest/external-task/{{externalTaskId}}/complete",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"engine-rest",
+						"external-task",
+						"{{externalTaskId}}",
+						"complete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "delete process model deployment",
 			"event": [
 				{
@@ -140,6 +349,14 @@
 	"variable": [
 		{
 			"key": "deploymentId",
+			"value": ""
+		},
+		{
+			"key": "processInstanceId",
+			"value": ""
+		},
+		{
+			"key": "externalTaskId",
 			"value": ""
 		}
 	]
