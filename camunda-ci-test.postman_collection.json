@@ -1,0 +1,43 @@
+{
+	"info": {
+		"_postman_id": "bd784e5a-ff1c-44b5-9722-c427c1ea5d1e",
+		"name": "camunda-ci-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ping app",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/camunda/app/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"camunda",
+						"app",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

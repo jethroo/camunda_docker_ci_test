@@ -1,0 +1,14 @@
+{
+  "name": "camunda_docker_ci_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "newman run camunda-ci-test.postman_collection.json"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "newman": "^5.2.2"
+  }
+}
