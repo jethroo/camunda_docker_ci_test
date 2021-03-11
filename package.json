@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "bpmnlint ./*.bpmn",
     "test": "newman run camunda-ci-test.postman_collection.json"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bpmnlint": "7.2.0",
     "newman": "^5.2.2"
   }
 }
