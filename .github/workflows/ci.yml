@@ -22,7 +22,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Read .nvmrc
-      run: echo ::set-output name=node_version::$(cat .nvmrc)
+      run: echo "name=node_version::$(cat .nvmrc)" >> $GITHUB_OUTPUT
       id: nvm
     - name: Setup node
       uses: actions/setup-node@v1
