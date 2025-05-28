@@ -13,6 +13,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      node_version: ${{ steps.set_node_version.outputs.node_version }}
+
     services:
       camunda:
         image: camunda/camunda-bpm-platform:7.17.0
@@ -21,13 +24,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Read .nvmrc
-      run: echo "name=node_version::$(cat .nvmrc)" >> $GITHUB_OUTPUT
-      id: nvm
+    - name: Read .nvmrc and set node_version output
+      id: set_node_version
+      run: echo "node_version=$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
     - name: Setup node
       uses: actions/setup-node@v1
       with:
-        node-version: '${{ steps.nvm.outputs.node_version }}'
+        node-version: ${{ steps.set_node_version.outputs.node_version }}
     - run: npm ci
     - run: npm run lint
     - run: npm run test
